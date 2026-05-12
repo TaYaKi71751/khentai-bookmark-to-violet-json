@@ -1,0 +1,704 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f3ed" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#101820" media="(prefers-color-scheme: dark)">
+  <title>KHenTai Bookmark to Violet JSON</title>
+  <link rel="icon" href="assets/khentai-to-violet-logo.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f6f3ed;
+      --panel: #fffdfa;
+      --panel-translucent: rgba(255, 253, 250, 0.88);
+      --pill-bg: rgba(255, 253, 250, 0.72);
+      --toolbar-bg: rgba(255, 255, 255, 0.54);
+      --surface: #fff;
+      --surface-soft: #fbfaf6;
+      --ink: #172026;
+      --muted: #5f6971;
+      --line: #d8d3ca;
+      --accent: #0f7f7c;
+      --accent-strong: #095f5c;
+      --danger: #b22d2d;
+      --drop-bg: #f8fbf8;
+      --drop-active-bg: #eaf8f4;
+      --drop-line: #9fb2ae;
+      --secondary-hover: #f0ebe3;
+      --pre-ink: #0c252b;
+      --focus: rgba(15, 127, 124, 0.28);
+      --index-bg: #e3f1ee;
+      --bg-wash-a: rgba(15, 127, 124, 0.12);
+      --bg-wash-b: rgba(187, 72, 58, 0.10);
+      --shadow: 0 16px 36px rgba(29, 38, 45, 0.12);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #101820;
+        --panel: #162329;
+        --panel-translucent: rgba(22, 35, 41, 0.9);
+        --pill-bg: rgba(22, 35, 41, 0.74);
+        --toolbar-bg: rgba(9, 18, 24, 0.44);
+        --surface: #111d23;
+        --surface-soft: #17272d;
+        --ink: #eef5f3;
+        --muted: #aab8b8;
+        --line: #314047;
+        --accent: #39b8ad;
+        --accent-strong: #72d3ca;
+        --danger: #ff8f84;
+        --drop-bg: #13242a;
+        --drop-active-bg: #17343a;
+        --drop-line: #4d696d;
+        --secondary-hover: #203238;
+        --pre-ink: #d9fffb;
+        --focus: rgba(57, 184, 173, 0.34);
+        --index-bg: #193b3e;
+        --bg-wash-a: rgba(57, 184, 173, 0.18);
+        --bg-wash-b: rgba(118, 95, 197, 0.14);
+        --shadow: 0 18px 40px rgba(0, 0, 0, 0.32);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        linear-gradient(120deg, var(--bg-wash-a), transparent 34%),
+        linear-gradient(240deg, var(--bg-wash-b), transparent 28%),
+        var(--bg);
+      color: var(--ink);
+    }
+
+    button,
+    textarea,
+    input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0;
+    }
+
+    header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 8px 0 24px;
+    }
+
+    .brand {
+      display: grid;
+      gap: 14px;
+    }
+
+    .brand-logo {
+      width: min(220px, 54vw);
+      height: auto;
+      filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.18));
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 4.2rem);
+      line-height: 0.96;
+      max-width: 740px;
+    }
+
+    .status-pill {
+      flex: 0 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--pill-bg);
+      color: var(--muted);
+      padding: 8px 12px;
+      font-size: 0.9rem;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.8fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .workspace,
+    .results {
+      background: var(--panel-translucent);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 58px;
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+      background: var(--toolbar-bg);
+    }
+
+    .toolbar-title {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .toolbar-title strong {
+      font-size: 0.95rem;
+    }
+
+    .toolbar-title span,
+    .hint,
+    .summary {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 38px;
+      border-radius: 7px;
+      background: var(--accent);
+      color: #fff;
+      padding: 0 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .button:hover {
+      background: var(--accent-strong);
+    }
+
+    .button.secondary {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--ink);
+    }
+
+    .button.secondary:hover {
+      background: var(--secondary-hover);
+    }
+
+    .button:disabled {
+      cursor: not-allowed;
+      opacity: 0.52;
+    }
+
+    .dropzone {
+      display: grid;
+      gap: 14px;
+      padding: 18px;
+    }
+
+    .file-box {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 128px;
+      border: 2px dashed var(--drop-line);
+      border-radius: 8px;
+      background: var(--drop-bg);
+      text-align: center;
+      transition: border-color 160ms ease, background 160ms ease;
+    }
+
+    .file-box.dragover {
+      border-color: var(--accent);
+      background: var(--drop-active-bg);
+    }
+
+    .file-box input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .file-box strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 300px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: var(--surface);
+      color: var(--ink);
+      line-height: 1.5;
+      tab-size: 2;
+    }
+
+    textarea:focus,
+    button:focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .message {
+      min-height: 22px;
+      color: var(--danger);
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .results-body {
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+      max-height: 640px;
+      overflow: auto;
+    }
+
+    .empty {
+      display: grid;
+      place-items: center;
+      min-height: 320px;
+      color: var(--muted);
+      text-align: center;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .result {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .result-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface-soft);
+    }
+
+    .result-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .result-index {
+      display: inline-grid;
+      flex: 0 0 auto;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: var(--index-bg);
+      color: var(--accent-strong);
+      font-size: 0.78rem;
+      font-weight: 900;
+    }
+
+    .result-name {
+      min-width: 0;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .result-count {
+      flex: 0 0 auto;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    .result-copy {
+      flex: 0 0 auto;
+      min-height: 32px;
+      padding: 0 10px;
+      font-size: 0.84rem;
+    }
+
+    .result-actions {
+      display: flex;
+      flex: 0 0 auto;
+      gap: 8px;
+    }
+
+    pre {
+      margin: 0;
+      padding: 12px;
+      overflow: auto;
+      color: var(--pre-ink);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 820px) {
+      .app {
+        width: min(100% - 20px, 680px);
+        padding: 18px 0;
+      }
+
+      header,
+      main {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        align-items: start;
+      }
+
+      .brand-logo {
+        width: min(190px, 64vw);
+      }
+
+      .status-pill {
+        width: fit-content;
+      }
+
+      .toolbar {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .actions {
+        justify-content: stretch;
+      }
+
+      .button {
+        flex: 1 1 140px;
+      }
+
+      .result-head {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .result-meta {
+        align-items: flex-start;
+      }
+
+      .result-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="brand">
+        <img class="brand-logo" src="assets/khentai-to-violet-logo.svg" alt="KHenTai bookmark to Violet JSON converter logo">
+        <h1>KHenTai Bookmark to Violet JSON</h1>
+      </div>
+      <div class="status-pill" id="installStatus">Offline ready</div>
+    </header>
+
+    <main>
+      <section class="workspace" aria-label="Input">
+        <div class="toolbar">
+          <div class="toolbar-title">
+            <strong>Source JSON</strong>
+            <span>Upload, drop, or paste an exported bookmark file.</span>
+          </div>
+          <div class="actions">
+            <button class="button secondary" type="button" id="sampleButton">Sample</button>
+            <button class="button secondary" type="button" id="clearButton">Clear</button>
+            <button class="button" type="button" id="convertButton">Convert</button>
+          </div>
+        </div>
+
+        <div class="dropzone">
+          <label class="file-box" id="fileBox">
+            <input id="fileInput" type="file" accept="application/json,.json">
+            <span>
+              <strong>Drop JSON here or choose a file</strong>
+              <span class="hint" id="fileName">No file selected</span>
+            </span>
+          </label>
+
+          <textarea id="sourceInput" spellcheck="false" autocomplete="off" placeholder='[{"name":"Bookmark","galleries":[{"id":3861599,"time":1778590230293}]}]'></textarea>
+          <div class="message" id="message" role="status" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="results" aria-label="Output">
+        <div class="toolbar">
+          <div class="toolbar-title">
+            <strong>Violet arrays</strong>
+            <span class="summary" id="summary">Waiting for input</span>
+          </div>
+          <div class="actions">
+            <button class="button secondary" type="button" id="copyButton" disabled>Copy all</button>
+            <button class="button" type="button" id="downloadButton" disabled>Download</button>
+          </div>
+        </div>
+        <div class="results-body" id="resultsBody">
+          <div class="empty">Converted bookmark groups will appear here.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const sample = [
+      {
+        name: "Bookmark",
+        private: 1,
+        created: 1778590192960,
+        updated: 1778590230293,
+        galleries: [{ id: 3861599, time: 1778590230293 }]
+      },
+      {
+        name: "Favorite 1",
+        private: 1,
+        created: 1778590515669,
+        updated: 1778590527578,
+        galleries: [{ id: 3861598, time: 1778590527578 }]
+      }
+    ];
+
+    const sourceInput = document.querySelector("#sourceInput");
+    const fileInput = document.querySelector("#fileInput");
+    const fileBox = document.querySelector("#fileBox");
+    const fileName = document.querySelector("#fileName");
+    const message = document.querySelector("#message");
+    const resultsBody = document.querySelector("#resultsBody");
+    const summary = document.querySelector("#summary");
+    const copyButton = document.querySelector("#copyButton");
+    const downloadButton = document.querySelector("#downloadButton");
+    const installStatus = document.querySelector("#installStatus");
+
+    let converted = [];
+
+    function convertBookmarks(input) {
+      if (!Array.isArray(input)) {
+        throw new Error("The root JSON value must be an array of bookmark groups.");
+      }
+
+      return input.map((group, index) => {
+        if (!group || !Array.isArray(group.galleries)) {
+          throw new Error(`Group ${index + 1} does not have a galleries array.`);
+        }
+
+        const ids = group.galleries.map((gallery, galleryIndex) => {
+          const id = gallery && gallery.id;
+
+          if (id === undefined || id === null || id === "") {
+            throw new Error(`Group ${index + 1}, gallery ${galleryIndex + 1} is missing an id.`);
+          }
+
+          return String(id);
+        });
+
+        return {
+          name: group.name || `Group ${index + 1}`,
+          ids,
+          text: JSON.stringify(ids)
+        };
+      });
+    }
+
+    function renderResults() {
+      resultsBody.innerHTML = "";
+
+      if (converted.length === 0) {
+        resultsBody.innerHTML = '<div class="empty">Converted bookmark groups will appear here.</div>';
+        summary.textContent = "Waiting for input";
+        copyButton.disabled = true;
+        downloadButton.disabled = true;
+        return;
+      }
+
+      const totalIds = converted.reduce((sum, group) => sum + group.ids.length, 0);
+      summary.textContent = `${converted.length} group${converted.length === 1 ? "" : "s"}, ${totalIds} id${totalIds === 1 ? "" : "s"}`;
+      copyButton.disabled = false;
+      downloadButton.disabled = false;
+
+      for (const group of converted) {
+        const article = document.createElement("article");
+        article.className = "result";
+
+        const head = document.createElement("div");
+        head.className = "result-head";
+
+        const meta = document.createElement("div");
+        meta.className = "result-meta";
+
+        const name = document.createElement("div");
+        name.className = "result-name";
+        name.textContent = group.name;
+
+        const count = document.createElement("div");
+        count.className = "result-count";
+        count.textContent = `${group.ids.length} id${group.ids.length === 1 ? "" : "s"}`;
+
+        const copy = document.createElement("button");
+        copy.className = "button secondary result-copy";
+        copy.type = "button";
+        copy.textContent = "Copy JSON";
+        copy.addEventListener("click", () => copyText(group.text, group.name));
+
+        const pre = document.createElement("pre");
+        pre.textContent = group.text;
+
+        meta.append(name, count);
+        head.append(meta, copy);
+        article.append(head, pre);
+        resultsBody.append(article);
+      }
+    }
+
+    function setMessage(text, isError = false) {
+      message.textContent = text;
+      message.style.color = isError ? "var(--danger)" : "var(--accent-strong)";
+    }
+
+    async function copyText(text, label) {
+      await navigator.clipboard.writeText(text);
+      setMessage(`${label} copied.`);
+    }
+
+    function convertCurrentInput() {
+      try {
+        const raw = sourceInput.value.trim();
+        if (!raw) {
+          converted = [];
+          renderResults();
+          setMessage("Paste or upload JSON to convert.", true);
+          return;
+        }
+
+        converted = convertBookmarks(JSON.parse(raw));
+        renderResults();
+        setMessage("Converted successfully.");
+      } catch (error) {
+        converted = [];
+        renderResults();
+        setMessage(error.message, true);
+      }
+    }
+
+    async function readFile(file) {
+      if (!file) {
+        return;
+      }
+
+      sourceInput.value = await file.text();
+      fileName.textContent = file.name;
+      convertCurrentInput();
+    }
+
+    function downloadText(filename, text) {
+      const blob = new Blob([text], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    document.querySelector("#sampleButton").addEventListener("click", () => {
+      sourceInput.value = JSON.stringify(sample, null, 2);
+      fileName.textContent = "Sample data";
+      convertCurrentInput();
+    });
+
+    document.querySelector("#clearButton").addEventListener("click", () => {
+      sourceInput.value = "";
+      fileInput.value = "";
+      fileName.textContent = "No file selected";
+      converted = [];
+      renderResults();
+      setMessage("");
+    });
+
+    document.querySelector("#convertButton").addEventListener("click", convertCurrentInput);
+    sourceInput.addEventListener("input", convertCurrentInput);
+    fileInput.addEventListener("change", (event) => readFile(event.target.files[0]));
+
+    for (const eventName of ["dragenter", "dragover"]) {
+      fileBox.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        fileBox.classList.add("dragover");
+      });
+    }
+
+    for (const eventName of ["dragleave", "drop"]) {
+      fileBox.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        fileBox.classList.remove("dragover");
+      });
+    }
+
+    fileBox.addEventListener("drop", (event) => readFile(event.dataTransfer.files[0]));
+
+    copyButton.addEventListener("click", async () => {
+      const text = converted.map((group) => group.text).join("\n");
+      await copyText(text, "All arrays");
+    });
+
+    downloadButton.addEventListener("click", () => {
+      const text = converted.map((group) => group.text).join("\n");
+      downloadText("violet-bookmarks.jsonl", text);
+      setMessage("Download prepared.");
+    });
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", async () => {
+        try {
+          await navigator.serviceWorker.register("service-worker.js");
+          installStatus.textContent = "Offline ready";
+        } catch {
+          installStatus.textContent = "Offline unavailable";
+        }
+      });
+    } else {
+      installStatus.textContent = "Offline unavailable";
+    }
+
+    renderResults();
+  </script>
+</body>
+</html>
